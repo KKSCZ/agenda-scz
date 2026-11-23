@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agenda SCZ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a daily agenda. A date rail on the left, event rows on the right, filters pinned on top. */
+:root{
+  --bg:#f4f7f2; --surface:#ffffff; --ink:#15241b; --muted:#5a6b60; --line:#d9e2da;
+  --accent:#0a7a43; --accent-ink:#ffffff; --accent-soft:#e2f2e8; --bloom:#bf2f76; --warn:#8a5a00; --warn-soft:#fbf1d8;
+  --c-musica:#bf2f76; --c-teatro:#6d4bc4; --c-cine:#1f6fc2; --c-expos:#b9770a; --c-bares:#d2532a; --c-ferias:#0d8a8a; --c-tradicion:#0a7a43; --c-gastronomia:#9a2c48;
+  --display:"Bricolage Grotesque","Figtree",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0e1612; --surface:#16211b; --ink:#e7f0e9; --muted:#9bb0a3; --line:#27372d;
+    --accent:#4fcb8b; --accent-ink:#06180e; --accent-soft:#17301f; --bloom:#f283b6; --warn:#f0c661; --warn-soft:#2e2713;
+    --c-musica:#f283b6; --c-teatro:#a892f0; --c-cine:#6fb0f2; --c-expos:#e6b04a; --c-bares:#f08a62; --c-ferias:#4cc9c9; --c-tradicion:#4fcb8b; --c-gastronomia:#ee8aa3;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0e1612; --surface:#16211b; --ink:#e7f0e9; --muted:#9bb0a3; --line:#27372d;
+  --accent:#4fcb8b; --accent-ink:#06180e; --accent-soft:#17301f; --bloom:#f283b6; --warn:#f0c661; --warn-soft:#2e2713;
+  --c-musica:#f283b6; --c-teatro:#a892f0; --c-cine:#6fb0f2; --c-expos:#e6b04a; --c-bares:#f08a62; --c-ferias:#4cc9c9; --c-tradicion:#4fcb8b; --c-gastronomia:#ee8aa3;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+a{color:var(--accent)}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--bloom);outline-offset:2px;border-radius:6px}
+.wrap{max-width:920px;margin:0 auto;padding:0 16px}
+
+header.top{padding:28px 0 14px}
+.brand{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.brand h1{font-family:var(--display);font-weight:800;font-size:clamp(2rem,6vw,3rem);line-height:1;margin:0;letter-spacing:-.02em}
+.brand h1 span{color:var(--accent)}
+.flag{display:inline-flex;flex-direction:column;width:26px;height:18px;border-radius:3px;overflow:hidden;border:1px solid var(--line);align-self:center}
+.flag i{flex:1;background:var(--accent)}
+.flag i:nth-child(2){background:#fff}
+.tag{margin:8px 0 0;color:var(--muted);max-width:60ch}
+.stamp{margin:10px 0 0;font-size:.85rem;color:var(--muted)}
+.stamp b{color:var(--ink);font-weight:600}
+
+.filters{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 0 12px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row + .row{margin-top:8px}
+.search{flex:1 1 220px;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.sel{padding:10px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+.chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);cursor:pointer;font-weight:500;font-size:.92rem;white-space:nowrap}
+.chip:hover{border-color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.chip .n{font-size:.8rem;opacity:.75;font-variant-numeric:tabular-nums}
+.dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:var(--muted)}
+.chip[aria-pressed="true"] .dot{background:var(--accent-ink)}
+.check{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;font-weight:500;font-size:.92rem;cursor:pointer;white-space:nowrap}
+.check input{width:18px;height:18px;accent-color:var(--accent)}
+
+main{padding:8px 0 40px}
+.count{margin:14px 0 4px;color:var(--muted);font-size:.92rem}
+.count button{background:none;border:0;color:var(--accent);text-decoration:underline;cursor:pointer;padding:0}
+section.day{display:grid;grid-template-columns:76px 1fr;gap:14px;padding:18px 0;border-top:1px solid var(--line)}
+section.day:first-of-type{border-top:0}
+.date{position:sticky;top:132px;align-self:start;text-align:center;font-family:var(--display);line-height:1.05}
+.date .dw{font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-family:var(--body)}
+.date .dn{font-size:2.1rem;font-weight:800;font-variant-numeric:tabular-nums}
+.date .mo{font-size:.9rem;font-weight:600;color:var(--muted);font-family:var(--body)}
+.date.today .dn{color:var(--accent)}
+.date .lbl{font-family:var(--display);font-weight:800;font-size:1.05rem;line-height:1.15}
+.list{display:flex;flex-direction:column;gap:10px;min-width:0}
+article.ev{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--cat,var(--muted));border-radius:var(--radius);padding:14px 16px}
+.ev .cats{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.ev .cats span{display:inline-flex;align-items:center;gap:5px}
+.ev h3{margin:5px 0 4px;font-size:1.12rem;line-height:1.25;font-weight:700;text-wrap:balance}
+.ev p{margin:0 0 10px;color:var(--muted);max-width:65ch}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 16px;margin:0}
+.meta div{min-width:0}
+.meta dt{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.meta dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+.meta dd small{display:block;font-weight:400;color:var(--muted);font-size:.86rem}
+.meta dd.na{font-weight:400;color:var(--muted);font-style:italic}
+.free{display:inline-block;background:var(--accent-soft);color:var(--accent);padding:1px 8px;border-radius:999px;font-weight:700}
+.foot{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin-top:12px;font-size:.88rem}
+.foot a.go{font-weight:700;text-decoration:none;border:1px solid var(--accent);border-radius:8px;padding:5px 10px}
+.foot a.go:hover{background:var(--accent);color:var(--accent-ink)}
+.foot .src{color:var(--muted)}
+.flagc{background:var(--warn-soft);color:var(--warn);border-radius:6px;padding:2px 8px;font-weight:600}
+.empty{padding:40px 0;text-align:center;color:var(--muted)}
+h2.sec{font-family:var(--display);font-weight:800;font-size:1.5rem;margin:34px 0 4px}
+p.secnote{margin:0 0 6px;color:var(--muted);max-width:65ch}
+.venues{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;padding:0;margin:14px 0 0;list-style:none}
+.venues li{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
+.venues a{font-weight:700;text-decoration:none}
+.venues a:hover{text-decoration:underline}
+.venues span{display:block;color:var(--muted);font-size:.9rem}
+footer{border-top:1px solid var(--line);padding:20px 0 40px;color:var(--muted);font-size:.88rem}
+footer p{max-width:70ch;margin:0 0 8px}
+@media (max-width:560px){
+  section.day{grid-template-columns:1fr;gap:8px}
+  .date{position:static;display:flex;align-items:baseline;gap:8px;text-align:left}
+  .date .dn{font-size:1.5rem}
+}
+
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font-weight:700;cursor:pointer;text-decoration:none;font-size:.95rem}
+.btn.ghost{background:var(--surface);color:var(--accent)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn .badge{background:var(--bloom);color:#fff;border-radius:999px;padding:0 7px;font-size:.78rem;font-variant-numeric:tabular-nums}
+dialog.panel{border:1px solid var(--line);border-radius:16px;background:var(--bg);color:var(--ink);padding:0;width:min(640px,calc(100% - 24px));max-height:calc(100% - 24px)}
+dialog.panel::backdrop{background:rgba(10,20,14,.55)}
+.panel-in{padding:20px 20px 22px;display:flex;flex-direction:column;gap:14px}
+.panel-head{display:flex;justify-content:space-between;align-items:start;gap:12px}
+.panel-head h2{font-family:var(--display);font-weight:800;font-size:1.45rem;margin:0;line-height:1.15}
+.panel-head p{margin:4px 0 0;color:var(--muted);font-size:.93rem;max-width:58ch}
+.x{background:none;border:1px solid var(--line);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:1.2rem;line-height:1;color:var(--muted);flex:0 0 auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fld.full{grid-column:1/-1}
+.fld label{font-size:.82rem;font-weight:700;color:var(--muted)}
+.fld label b{color:var(--bloom)}
+.fld input,.fld select,.fld textarea{padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--surface);width:100%}
+.fld textarea{min-height:84px;resize:vertical}
+.hint{font-size:.84rem;color:var(--muted);margin:0}
+.msg{border-radius:10px;padding:10px 12px;font-size:.92rem;margin:0}
+.msg.ok{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.msg.err{background:var(--warn-soft);color:var(--warn);font-weight:600}
+.sendrow{display:flex;flex-wrap:wrap;gap:8px}
+.preview{white-space:pre-wrap;background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:10px 12px;font-size:.88rem;max-height:180px;overflow:auto;margin:0}
+.inbox-list{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.inbox-list li{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.inbox-list .top{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:.82rem;color:var(--muted)}
+.inbox-list .txt{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.92rem;max-height:9em;overflow:auto}
+.inbox-list .res{font-size:.86rem;color:var(--muted)}
+.pill{border-radius:999px;padding:1px 9px;font-weight:700;font-size:.76rem}
+.pill.pendiente{background:var(--warn-soft);color:var(--warn)}
+.pill.agregado{background:var(--accent-soft);color:var(--accent)}
+.pill.descartado{background:var(--line);color:var(--muted)}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0;font-size:.82rem}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){.chip,.foot a.go{transition:background .15s,border-color .15s,color .15s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="flag" aria-hidden="true"><i></i><i></i><i></i></span>
+      <h1>Agenda <span>SCZ</span></h1>
+    </div>
+    <p class="tag">Música, teatro, cine, museos, gastronomía y fiestas en Santa Cruz de la Sierra, en un solo lugar. Los próximos tres meses, día por día.</p>
+    <p class="stamp" id="stamp"></p>
+    <div class="actions">
+      <button type="button" class="btn" id="open-submit">+ Publicar un evento</button>
+      <button type="button" class="btn ghost" id="open-inbox" hidden>Mi bandeja <span class="badge" id="inbox-badge" hidden></span></button>
+    </div>
+  </header>
+</div>
+
+<div class="filters">
+  <div class="wrap">
+    <div class="row">
+      <input class="search" id="q" type="search" placeholder="Buscar artista, obra o lugar" aria-label="Buscar">
+      <select class="sel" id="when" aria-label="Cuándo">
+        <option value="all">Próximos 3 meses</option>
+        <option value="hoy">Hoy</option>
+        <option value="finde">Este fin de semana</option>
+        <option value="7d">Próximos 7 días</option>
+      </select>
+      <select class="sel" id="org" aria-label="Quién organiza">
+        <option value="all">Todos los espacios</option>
+        <option value="publico">Municipales y públicos</option>
+        <option value="cultural">Centros culturales</option>
+        <option value="privado">Privados</option>
+      </select>
+      <label class="check" for="free"><input type="checkbox" id="free"> Solo gratis</label>
+    </div>
+    <div class="row"><div class="chips" id="chips" role="group" aria-label="Tipo de evento"></div></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <main>
+    <p class="count" id="count" aria-live="polite"></p>
+    <div id="list"></div>
+
+    <h2 class="sec" id="semanal-h">Todas las semanas</h2>
+    <p class="secnote" id="semanal-note">Actividades fijas en bares, restaurantes y plazas.</p>
+    <div id="weekly"></div>
+
+    <h2 class="sec">Espacios y cines</h2>
+    <p class="secnote">Lugares con programación permanente. El enlace lleva a su agenda o a los horarios del día.</p>
+    <ul class="venues" id="venues"></ul>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>Agenda SCZ reúne información publicada por medios, boleterías, instituciones culturales y la Alcaldía. Los datos marcados como “por confirmar” no estaban publicados en la fuente: revise el enlace antes de salir.</p>
+    <p>Fuentes de esta edición: El Deber, La Razón, Unitel, Red Uno, Asuntos Centrales, Gourmet Magazine Bolivia, Sonilum, Urubó Biergarten, Vamos Eventos, Secretaría Municipal de Cultura y Turismo, Fexpocruz, Bolivamos, Ticketeg, Multipago, Ventik, Eventbrite, Songkick, Shazam y Bolivia.com Cine.</p>
+    <p>Versión de prueba. La agenda se actualiza todas las noches a las 23:00.</p>
+  </div>
+</footer>
+
+
+<dialog class="panel" id="dlg-submit" aria-labelledby="sub-h">
+  <form class="panel-in" id="sub-form" novalidate>
+    <div class="panel-head">
+      <div><h2 id="sub-h">Publicar un evento</h2>
+      <p>¿Organiza un concierto, una obra, una cena o una exposición en Santa Cruz? Complete los datos y envíenoslos. Publicar en Agenda SCZ es gratis.</p></div>
+      <button type="button" class="x" data-close aria-label="Cerrar">×</button>
+    </div>
+    <div class="grid2">
+      <div class="fld full"><label for="f-title">Nombre del evento <b>*</b></label><input id="f-title" required maxlength="140"></div>
+      <div class="fld"><label for="f-cat">Tipo</label><select id="f-cat"></select></div>
+      <div class="fld"><label for="f-venue">Lugar <b>*</b></label><input id="f-venue" required maxlength="140" placeholder="Nombre y zona"></div>
+      <div class="fld"><label for="f-start">Fecha <b>*</b></label><input id="f-start" type="date" required></div>
+      <div class="fld"><label for="f-end">Hasta (si dura varios días)</label><input id="f-end" type="date"></div>
+      <div class="fld"><label for="f-time">Hora</label><input id="f-time" type="time"></div>
+      <div class="fld"><label for="f-cost">Costo</label><input id="f-cost" maxlength="80" placeholder="Ej.: Bs 80, o Gratis"></div>
+      <div class="fld full"><label for="f-url">Enlace (Instagram, Facebook, web o venta de entradas)</label><input id="f-url" type="url" maxlength="400" placeholder="https://"></div>
+      <div class="fld full"><label for="f-desc">¿De qué se trata?</label><textarea id="f-desc" maxlength="900"></textarea></div>
+      <div class="fld full"><label for="f-contact">Su nombre y teléfono o correo (no se publica)</label><input id="f-contact" maxlength="140"></div>
+    </div>
+    <p class="msg err" id="sub-err" hidden></p>
+    <div id="sub-send" hidden>
+      <p class="hint" id="sub-send-note"></p>
+      <pre class="preview" id="sub-preview"></pre>
+      <div class="sendrow" id="sub-buttons"></div>
+      <p class="msg ok" id="sub-ok" hidden></p>
+    </div>
+    <div class="sendrow" id="sub-prepare-row"><button type="submit" class="btn">Continuar</button></div>
+  </form>
+</dialog>
+
+<dialog class="panel" id="dlg-inbox" aria-labelledby="inb-h">
+  <div class="panel-in">
+    <div class="panel-head">
+      <div><h2 id="inb-h">Mi bandeja</h2>
+      <p>Solo usted ve esta bandeja. Pegue aquí lo que vea en Instagram, Facebook o WhatsApp. Cada noche la actualización revisa lo pendiente, agrega los eventos que pueda confirmar y le deja una nota.</p></div>
+      <button type="button" class="x" data-close aria-label="Cerrar">×</button>
+    </div>
+    <form id="inb-form" class="grid2" novalidate>
+      <div class="fld full"><label for="i-text">Texto de la publicación o nota <b>*</b></label><textarea id="i-text" maxlength="4000" placeholder="Copie el texto del post: nombre, fecha, hora, lugar, precio…"></textarea></div>
+      <div class="fld full"><label for="i-url">Enlace al post (opcional)</label><input id="i-url" type="url" maxlength="400" placeholder="https://www.instagram.com/p/…"></div>
+      <div class="sendrow fld full"><button type="submit" class="btn" id="i-save">Guardar en la bandeja</button></div>
+    </form>
+    <p class="hint">Consejo: Instagram no deja leer los posts desde fuera, así que pegue también el texto, no solo el enlace.</p>
+    <p class="msg" id="inb-status" hidden></p>
+    <ul class="inbox-list" id="inb-list"></ul>
+  </div>
+</dialog>
+
+<script src="events.js"></script>
+<script>
+(function(){
+  var DATA = window.SCZ_DATA || {events:[],weekly:[],venues:[],updated:""};
+  var CATS = [
+    ["musica","Música"],["teatro","Teatro y danza"],["cine","Cine"],["expos","Museos y exposiciones"],["gastronomia","Gastronomía"],
+    ["bares","Bares y noche"],["ferias","Ferias y encuentros"],["tradicion","Carnaval y tradición"]
+  ];
+  var CAT = {}; CATS.forEach(function(c){CAT[c[0]]=c[1];});
+  var DOW = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+  var DW3 = ["dom","lun","mar","mié","jue","vie","sáb"];
+  var MO = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  var MO3 = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+  var WINDOW_DAYS = 92;
+
+  // Dates are handled as day numbers in Bolivia time (UTC-4, no daylight saving).
+  function dayNum(iso){var p=iso.split("-");return Math.floor(Date.UTC(+p[0],+p[1]-1,+p[2])/864e5);}
+  function fromNum(n){return new Date(n*864e5);}
+  var TODAY = Math.floor((Date.now()-4*3600e3)/864e5);
+  function dowOf(n){return fromNum(n).getUTCDay();}
+  function fmt(n,long){var d=fromNum(n);return long? DOW[d.getUTCDay()]+" "+d.getUTCDate()+" de "+MO[d.getUTCMonth()] : d.getUTCDate()+" "+MO3[d.getUTCMonth()];}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function norm(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");}
+  function safeUrl(u){return /^https?:\/\//i.test(u||"")?u:"";}
+
+  var events = (DATA.events||[]).map(function(e){
+    var s=dayNum(e.start), en=e.end?dayNum(e.end):s;
+    return Object.assign({},e,{s:s,e:en,hay:norm([e.title,e.venue,e.zone,e.desc,(e.cats||[]).map(function(c){return CAT[c];}).join(" ")].join(" "))});
+  }).filter(function(e){return e.e>=TODAY && e.s<=TODAY+WINDOW_DAYS;});
+  var weekly = (DATA.weekly||[]).map(function(e){
+    return Object.assign({},e,{hay:norm([e.title,e.venue,e.zone,e.desc].join(" "))});
+  });
+
+  var state = {q:"",when:"all",org:"all",free:false,cat:"all"};
+  try{var saved=JSON.parse(localStorage.getItem("agenda-scz-filtros")||"null");if(saved&&CAT[saved.cat])state.cat=saved.cat;}catch(err){}
+
+  function range(){
+    if(state.when==="hoy") return [TODAY,TODAY];
+    if(state.when==="7d") return [TODAY,TODAY+6];
+    if(state.when==="finde"){
+      var d=dowOf(TODAY); // Friday to Sunday
+      if(d===0) return [TODAY,TODAY];
+      if(d>=5) return [TODAY,TODAY+(7-d)];
+      return [TODAY+(5-d),TODAY+(7-d)];
+    }
+    return [TODAY,TODAY+WINDOW_DAYS];
+  }
+  function passes(e,ignoreCat){
+    if(!ignoreCat && state.cat!=="all" && (e.cats||[]).indexOf(state.cat)<0) return false;
+    if(state.org!=="all" && e.org!==state.org) return false;
+    if(state.free && !e.free) return false;
+    if(state.q && e.hay.indexOf(norm(state.q))<0) return false;
+    return true;
+  }
+  function inRange(e,r){return e.e>=r[0] && e.s<=r[1];}
+
+  function card(e,whenText){
+    var first=(e.cats||[])[0];
+    var cats=(e.cats||[]).map(function(c){return '<span><i class="dot" style="background:var(--c-'+c+')"></i>'+esc(CAT[c]||c)+'</span>';}).join("");
+    var time = e.time ? '<dd>'+esc(e.time)+(whenText?'<small>'+esc(whenText)+'</small>':'')+'</dd>'
+                      : (whenText ? '<dd>'+esc(whenText)+'<small>Hora por confirmar</small></dd>' : '<dd class="na">Por confirmar</dd>');
+    var cost = e.free ? '<dd><span class="free">'+esc(e.cost||"Gratis")+'</span></dd>'
+                      : (e.cost ? '<dd>'+esc(e.cost)+'</dd>' : '<dd class="na">No publicado</dd>');
+    var url=safeUrl(e.url);
+    return '<article class="ev" style="--cat:var(--c-'+esc(first)+')">'
+      +'<div class="cats">'+cats+'</div>'
+      +'<h3>'+esc(e.title)+'</h3>'
+      +(e.desc?'<p>'+esc(e.desc)+'</p>':'')
+      +'<dl class="meta">'
+      +'<div><dt>Cuándo</dt>'+time+'</div>'
+      +'<div><dt>Dónde</dt><dd>'+esc(e.venue)+(e.zone?'<small>'+esc(e.zone)+'</small>':'')+'</dd></div>'
+      +'<div><dt>Costo</dt>'+cost+'</div>'
+      +'</dl>'
+      +'<div class="foot">'
+      +(url?'<a class="go" href="'+esc(url)+'" target="_blank" rel="noopener">Ver más y entradas</a>':'')
+      +(e.confirm?'<span class="flagc">Faltan datos por confirmar</span>':'')
+      +(e.src?'<span class="src">Fuente: '+esc(e.src)+'</span>':'')
+      +'</div></article>';
+  }
+  function dateRail(n){
+    var d=fromNum(n), t=n===TODAY;
+    return '<div class="date'+(t?' today':'')+'"><div class="dw">'+(t?'hoy':(n===TODAY+1?'mañana':DW3[d.getUTCDay()]))+'</div><div class="dn">'+d.getUTCDate()+'</div><div class="mo">'+MO3[d.getUTCMonth()]+'</div></div>';
+  }
+
+  function render(){
+    var r=range();
+    var shown=events.filter(function(e){return passes(e)&&inRange(e,r);});
+    // Events already running (exhibitions, film runs) go in one block; the rest by start day.
+    var ongoing=shown.filter(function(e){return e.s<r[0];});
+    var dated=shown.filter(function(e){return e.s>=r[0];}).sort(function(a,b){return a.s-b.s||(a.time||"99").localeCompare(b.time||"99")||a.title.localeCompare(b.title);});
+    var html="";
+    if(ongoing.length){
+      ongoing.sort(function(a,b){return a.e-b.e;});
+      html+='<section class="day"><div class="date"><div class="lbl">En curso</div><div class="mo">abierto ahora</div></div><div class="list">'
+        +ongoing.map(function(e){return card(e,"Hasta el "+fmt(e.e,true));}).join("")+'</div></section>';
+    }
+    var byDay={},order=[];
+    dated.forEach(function(e){if(!byDay[e.s]){byDay[e.s]=[];order.push(e.s);}byDay[e.s].push(e);});
+    order.forEach(function(n){
+      html+='<section class="day" aria-label="'+esc(fmt(n,true))+'">'+dateRail(n)+'<div class="list">'
+        +byDay[n].map(function(e){return card(e,e.e>e.s?("Del "+fmt(e.s)+" al "+fmt(e.e)):fmt(n,true));}).join("")+'</div></section>';
+    });
+    if(!shown.length) html='<p class="empty">No hay eventos con estos filtros. Pruebe con otra fecha o quite un filtro.</p>';
+    document.getElementById("list").innerHTML=html;
+
+    var filtered = state.q||state.org!=="all"||state.free||state.cat!=="all"||state.when!=="all";
+    document.getElementById("count").innerHTML = shown.length+(shown.length===1?" evento":" eventos")
+      +(filtered?' · <button type="button" id="clear">Quitar filtros</button>':"");
+    var c=document.getElementById("clear"); if(c) c.onclick=reset;
+
+    // Weekly activities: only the weekdays that fall inside the chosen range.
+    var days={}; for(var n=r[0];n<=Math.min(r[1],r[0]+6);n++) days[dowOf(n)]=1;
+    var w=weekly.filter(function(e){return passes(e)&&days[e.dow];}).sort(function(a,b){return ((a.dow+6)%7)-((b.dow+6)%7);});
+    document.getElementById("weekly").innerHTML = w.length
+      ? '<section class="day"><div class="date"><div class="lbl">Fijos</div><div class="mo">cada semana</div></div><div class="list">'+w.map(function(e){return card(e,"Todos los "+DOW[e.dow]+(e.dow===6||e.dow===0?"s":""));}).join("")+'</div></section>'
+      : "";
+    document.getElementById("semanal-h").hidden=!w.length;
+    document.getElementById("semanal-note").hidden=!w.length;
+
+    // Chip counts follow the other filters.
+    var base=events.filter(function(e){return passes(e,true)&&inRange(e,r);});
+    var chips='<button type="button" class="chip" data-cat="all" aria-pressed="'+(state.cat==="all")+'">Todo <span class="n">'+base.length+'</span></button>';
+    CATS.forEach(function(cdef){
+      var k=base.filter(function(e){return e.cats.indexOf(cdef[0])>=0;}).length;
+      chips+='<button type="button" class="chip" data-cat="'+cdef[0]+'" aria-pressed="'+(state.cat===cdef[0])+'"><i class="dot" style="background:var(--c-'+cdef[0]+')"></i>'+cdef[1]+' <span class="n">'+k+'</span></button>';
+    });
+    document.getElementById("chips").innerHTML=chips;
+    try{localStorage.setItem("agenda-scz-filtros",JSON.stringify({cat:state.cat}));}catch(err){}
+  }
+  function reset(){
+    state={q:"",when:"all",org:"all",free:false,cat:"all"};
+    document.getElementById("q").value="";document.getElementById("when").value="all";
+    document.getElementById("org").value="all";document.getElementById("free").checked=false;render();
+  }
+
+  document.getElementById("chips").addEventListener("click",function(ev){
+    var b=ev.target.closest("[data-cat]"); if(!b) return; state.cat=b.getAttribute("data-cat"); render();
+    var again=document.querySelector('#chips [data-cat="'+state.cat+'"]'); if(again) again.focus();
+  });
+  document.getElementById("q").addEventListener("input",function(e){state.q=e.target.value.trim();render();});
+  document.getElementById("when").addEventListener("change",function(e){state.when=e.target.value;render();});
+  document.getElementById("org").addEventListener("change",function(e){state.org=e.target.value;render();});
+  document.getElementById("free").addEventListener("change",function(e){state.free=e.target.checked;render();});
+
+  document.getElementById("venues").innerHTML=(DATA.venues||[]).map(function(v){
+    var u=safeUrl(v.url);
+    return '<li>'+(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(v.name)+'</a>':'<b>'+esc(v.name)+'</b>')+'<span>'+esc(v.note)+'</span></li>';
+  }).join("");
+
+  var st=document.getElementById("stamp");
+  if(DATA.updated){
+    var m=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(DATA.updated);
+    if(m) st.innerHTML='Actualizado el <b>'+(+m[3])+' de '+MO[+m[2]-1]+' de '+m[1]+', '+m[4]+':'+m[5]+'</b> (hora de Bolivia) · hoy es '+esc(fmt(TODAY,true));
+  }
+  render();
+})();
+</script>
+
+<script>
+/* Event submissions and the owner's private inbox.
+   Public visitors cannot save data in this app, so the public form sends the event by WhatsApp or email.
+   The owner can save straight into the inbox (db collection "inbox", readable and writable by the owner only). */
+(function(){
+  // Where public submissions are sent. Fill in to enable the WhatsApp and email buttons.
+  var CONTACT = { whatsapp: "", email: "" };   // whatsapp: digits with country code, e.g. "59170000000"
+
+  var CATS = [["musica","Música"],["teatro","Teatro y danza"],["cine","Cine"],["expos","Museos y exposiciones"],["gastronomia","Gastronomía"],["bares","Bares y noche"],["ferias","Ferias y encuentros"],["tradicion","Carnaval y tradición"]];
+  var $ = function(id){return document.getElementById(id);};
+  var db = null, isOwner = false, inboxUnsub = null, items = [];
+
+  function openDlg(d){ if(d.showModal){ try{d.showModal();return;}catch(e){} } d.setAttribute("open",""); }
+  function closeDlg(d){ if(d.close) d.close(); else d.removeAttribute("open"); }
+  document.querySelectorAll("dialog.panel").forEach(function(d){
+    d.addEventListener("click",function(e){ if(e.target===d || e.target.closest("[data-close]")) closeDlg(d); });
+  });
+  $("f-cat").innerHTML = CATS.map(function(c){return '<option value="'+c[0]+'">'+c[1]+'</option>';}).join("");
+
+  // ---------- Public form ----------
+  var lastFields = null, lastText = "";
+  function val(id){ return $(id).value.trim(); }
+  function catName(k){ for(var i=0;i<CATS.length;i++) if(CATS[i][0]===k) return CATS[i][1]; return k; }
+  function fmtDate(iso){ if(!iso) return ""; var p=iso.split("-"); return p[2]+"/"+p[1]+"/"+p[0]; }
+  function compose(f){
+    var L=["Nuevo evento para Agenda SCZ","Nombre: "+f.title,"Tipo: "+catName(f.cat),
+      "Fecha: "+fmtDate(f.start)+(f.end&&f.end!==f.start?" al "+fmtDate(f.end):"")];
+    if(f.time) L.push("Hora: "+f.time);
+    L.push("Lugar: "+f.venue);
+    if(f.cost) L.push("Costo: "+f.cost);
+    if(f.url) L.push("Enlace: "+f.url);
+    if(f.desc) L.push("Descripción: "+f.desc);
+    if(f.contact) L.push("Contacto (no publicar): "+f.contact);
+    return L.join("\n");
+  }
+  function resetSend(){ $("sub-send").hidden=true; $("sub-prepare-row").hidden=false; $("sub-ok").hidden=true; }
+  $("sub-form").addEventListener("input",resetSend);
+  $("sub-form").addEventListener("submit",function(e){
+    e.preventDefault();
+    var f={title:val("f-title"),cat:$("f-cat").value,venue:val("f-venue"),start:$("f-start").value,end:$("f-end").value,
+           time:$("f-time").value,cost:val("f-cost"),url:val("f-url"),desc:val("f-desc"),contact:val("f-contact")};
+    var miss=[]; if(!f.title)miss.push("el nombre"); if(!f.venue)miss.push("el lugar"); if(!f.start)miss.push("la fecha");
+    var err=$("sub-err");
+    if(miss.length){ err.textContent="Falta "+miss.join(", ")+"."; err.hidden=false; return; }
+    if(f.end && f.end<f.start){ err.textContent="La fecha final es anterior a la fecha de inicio."; err.hidden=false; return; }
+    if(f.url && !/^https?:\/\//i.test(f.url)){ err.textContent="El enlace debe empezar con https://"; err.hidden=false; return; }
+    err.hidden=true; lastFields=f; lastText=compose(f);
+    $("sub-preview").textContent=lastText;
+    var b=[];
+    if(isOwner && db) b.push('<button type="button" class="btn" id="b-save">Guardar en mi bandeja</button>');
+    if(CONTACT.whatsapp) b.push('<a class="btn'+(b.length?' ghost':'')+'" target="_blank" rel="noopener" href="https://wa.me/'+encodeURIComponent(CONTACT.whatsapp)+'?text='+encodeURIComponent(lastText)+'">Enviar por WhatsApp</a>');
+    if(CONTACT.email) b.push('<a class="btn ghost" target="_blank" rel="noopener" href="mailto:'+encodeURIComponent(CONTACT.email)+'?subject='+encodeURIComponent("Evento para Agenda SCZ: "+f.title)+'&body='+encodeURIComponent(lastText)+'">Enviar por correo</a>');
+    b.push('<button type="button" class="btn ghost" id="b-copy">Copiar texto</button>');
+    $("sub-buttons").innerHTML=b.join("");
+    var note = (CONTACT.whatsapp||CONTACT.email)
+      ? "Revise el texto y envíelo por WhatsApp o correo."+(CONTACT.email?" Si el botón de correo no abre, copie el texto y escriba a "+CONTACT.email+".":"")
+      : (isOwner ? "Está conectado como dueño: puede guardarlo directo en su bandeja." : "Copie el texto y envíelo al equipo de Agenda SCZ.");
+    $("sub-send-note").textContent=note;
+    $("sub-send").hidden=false; $("sub-prepare-row").hidden=true;
+    var cp=$("b-copy"); if(cp) cp.onclick=function(){
+      var ok=$("sub-ok");
+      try{ navigator.clipboard.writeText(lastText).then(function(){ok.textContent="Texto copiado.";ok.hidden=false;},function(){ok.textContent="No se pudo copiar: seleccione el texto de arriba y cópielo.";ok.hidden=false;}); }
+      catch(x){ ok.textContent="No se pudo copiar: seleccione el texto de arriba y cópielo."; ok.hidden=false; }
+    };
+    var sv=$("b-save"); if(sv) sv.onclick=function(){
+      sv.disabled=true;
+      saveInbox({kind:"formulario",text:lastText,url:lastFields.url||"",fields:lastFields}).then(function(){
+        var ok=$("sub-ok"); ok.textContent="Guardado en su bandeja. Se revisará esta noche."; ok.hidden=false;
+        $("sub-form").reset(); lastFields=null;
+      },function(e){ sv.disabled=false; err.textContent=dbMsg(e); err.hidden=false; });
+    };
+  });
+  $("open-submit").addEventListener("click",function(){ resetSend(); $("sub-err").hidden=true; openDlg($("dlg-submit")); $("f-title").focus(); });
+
+  // ---------- Owner inbox ----------
+  function dbMsg(e){
+    var c=e&&e.code;
+    if(c==="quota_exceeded") return "La bandeja está llena. Borre algunas notas antiguas.";
+    if(c==="revoked"||c==="not_granted"||c==="capability_disabled") return "La bandeja no está disponible en esta vista. Abra la agenda desde claude.ai con su cuenta.";
+    return "No se pudo guardar. Intente de nuevo en un momento.";
+  }
+  function saveInbox(doc){
+    if(!db) return Promise.reject({code:"not_granted"});
+    doc.createdAt=new Date().toISOString(); doc.status="pendiente"; doc.result="";
+    return db.collection("inbox").add(doc);
+  }
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function when(iso){ try{ return new Date(iso).toLocaleString("es-BO",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"America/La_Paz"}); }catch(e){ return ""; } }
+  function renderInbox(){
+    var pend=items.filter(function(i){return i.status==="pendiente";}).length;
+    var bd=$("inbox-badge"); bd.textContent=pend; bd.hidden=!pend;
+    var label={pendiente:"Pendiente",agregado:"Agregado",descartado:"No agregado"};
+    $("inb-list").innerHTML = items.length ? items.map(function(i){
+      var u=/^https?:\/\//i.test(i.url||"")?i.url:"";
+      return '<li><div class="top"><span><span class="pill '+esc(i.status)+'">'+esc(label[i.status]||i.status)+'</span> · '+esc(when(i.createdAt))+(i.kind==="formulario"?' · formulario':'')+'</span>'
+        +'<button type="button" class="linkbtn" data-del="'+esc(i.id)+'">Borrar</button></div>'
+        +'<div class="txt">'+esc(i.text)+'</div>'
+        +(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener">Abrir enlace</a>':'')
+        +(i.result?'<div class="res">'+esc(i.result)+'</div>':'')+'</li>';
+    }).join("") : '<li><div class="txt">La bandeja está vacía.</div></li>';
+  }
+  function status(t,kind){ var m=$("inb-status"); m.textContent=t; m.className="msg"+(kind?" "+kind:""); m.hidden=!t; }
+  $("inb-list").addEventListener("click",function(e){
+    var b=e.target.closest("[data-del]"); if(!b||!db) return;
+    b.disabled=true;
+    db.collection("inbox").doc(b.getAttribute("data-del")).delete().catch(function(err){ b.disabled=false; status(dbMsg(err),"err"); });
+  });
+  $("inb-form").addEventListener("submit",function(e){
+    e.preventDefault();
+    var t=$("i-text").value.trim(), u=$("i-url").value.trim();
+    if(!t && !u){ status("Pegue el texto del post o un enlace.","err"); return; }
+    if(u && !/^https?:\/\//i.test(u)){ status("El enlace debe empezar con https://","err"); return; }
+    var btn=$("i-save"); btn.disabled=true;
+    saveInbox({kind:"nota",text:t||u,url:u}).then(function(){
+      $("inb-form").reset(); btn.disabled=false; status("Guardado. Se revisará en la actualización de esta noche.","ok");
+    },function(err){ btn.disabled=false; status(dbMsg(err),"err"); });
+  });
+  $("open-inbox").addEventListener("click",function(){ openDlg($("dlg-inbox")); });
+
+  function startInbox(){
+    var timer=setTimeout(function(){ status("No se pudo cargar la bandeja todavía. Revise su conexión.","err"); },10000);
+    inboxUnsub = db.collection("inbox").orderBy("createdAt","desc").limit(300).onSnapshot(function(snap){
+      if(!snap.metadata.fromCache){ clearTimeout(timer); if($("inb-status").className.indexOf("err")>=0) status(""); }
+      items=snap.docs.map(function(d){ var x=d.data()||{}; return {id:d.id,text:x.text||"",url:x.url||"",kind:x.kind||"nota",status:x.status||"pendiente",result:x.result||"",createdAt:x.createdAt||""}; });
+      renderInbox();
+    },function(err){ clearTimeout(timer); status(dbMsg(err),"err"); });
+  }
+
+  if(window.claude && typeof window.claude.use==="function"){
+    Promise.all([window.claude.use("user"),window.claude.use("db")]).then(function(r){
+      var user=r[0]; db=r[1];
+      return Promise.resolve(user && typeof user.isOwner==="function" ? user.isOwner() : false).then(function(o){
+        isOwner=!!o && !!db;
+        if(isOwner){ $("open-inbox").hidden=false; startInbox(); }
+      });
+    }).catch(function(){});
+  }
+})();
+</script>
+</body>
+</html>
