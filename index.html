@@ -152,9 +152,57 @@ dialog.panel::backdrop{background:rgba(10,20,14,.55)}
 .linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0;font-size:.82rem}
 @media (max-width:560px){.grid2{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:no-preference){.chip,.foot a.go{transition:background .15s,border-color .15s,color .15s}}
+
+/* ---- Visual layer: Santa Cruz green, toborochi pink, tajibo gold ---- */
+:root{--green:#00703c;--green-deep:#00532c;--pink:#e2457a;--gold:#f4b400;--bg:#fbfcf8;--line:#dde6dc;--accent:#00703c;--accent-soft:#e1f1e6;--bloom:#d2336a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--green:#0f4a2c;--green-deep:#0a3520;--pink:#f06b98;--gold:#f7c63d;--bg:#0e1612}}
+:root[data-theme="dark"]{--green:#0f4a2c;--green-deep:#0a3520;--pink:#f06b98;--gold:#f7c63d;--bg:#0e1612}
+.hero{position:relative;overflow:hidden;background:var(--green);color:#fff;box-shadow:inset 0 -10px 0 #fff,inset 0 -18px 0 var(--green-deep)}
+.hero .wrap{position:relative;z-index:1}
+.blooms{position:absolute;right:-30px;top:-10px;width:min(520px,70vw);height:auto;pointer-events:none}
+header.top{padding:40px 0 46px}
+.brand h1{font-size:clamp(2.6rem,9vw,4.6rem);letter-spacing:-.035em;color:#fff}
+.brand h1 span{color:inherit}
+.hero .flag{display:none}
+.tag{color:rgba(255,255,255,.9);font-size:1.08rem;max-width:44ch;margin-top:12px}
+.stamp{color:rgba(255,255,255,.75)}
+.stamp b{color:#fff}
+.hero .btn{background:var(--gold);border-color:var(--gold);color:#1c1a05;padding:11px 18px;border-radius:999px;font-size:1rem}
+.hero .btn:hover{background:#ffc928;border-color:#ffc928}
+.hero .btn.ghost{background:transparent;border-color:rgba(255,255,255,.7);color:#fff}
+.filters{background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.chip[aria-pressed="true"]{background:var(--cc,var(--green));border-color:var(--cc,var(--green));color:#fff}
+.chip[aria-pressed="true"] .dot{background:#fff}
+.chip:hover{border-color:var(--cc,var(--muted))}
+section.day{padding:22px 0}
+.date .dw{text-transform:none;letter-spacing:0;font-size:.85rem}
+.date .dn{font-size:2.4rem;color:var(--green)}
+.date.today .dn{display:inline-grid;place-items:center;width:58px;height:58px;border-radius:50%;background:var(--pink);color:#fff;font-size:1.9rem;margin:2px auto}
+.date.today .dw{color:var(--pink);font-weight:800}
+article.ev{border-left-width:6px;border-radius:14px;padding:16px 18px;transition:border-color .15s}
+article.ev:hover{border-color:var(--cat,var(--muted));border-left-color:var(--cat,var(--muted))}
+.ev .cats{text-transform:none;letter-spacing:0;font-size:.84rem;color:var(--cat,var(--muted))}
+.ev h3{font-family:var(--display);font-weight:800;font-size:1.3rem;letter-spacing:-.01em}
+.meta dt{text-transform:none;letter-spacing:0;font-size:.8rem;font-weight:600}
+.foot a.go{border-radius:999px;padding:6px 14px}
+.foot a.go.buy{background:var(--pink);border-color:var(--pink);color:#fff}
+.foot a.go.buy:hover{background:var(--bloom);border-color:var(--bloom)}
+h2.sec{font-size:1.9rem;letter-spacing:-.02em;color:var(--green)}
+.venues li{border-top:4px solid var(--gold)}
+footer{background:var(--green-deep);color:rgba(255,255,255,.82);border-top:0;margin-top:30px}
+footer b{color:#fff}
+@media (max-width:560px){header.top{padding:78px 0 40px}.blooms{width:72vw;right:-70px;top:-62px;opacity:1}.blooms path{display:none}.date.today .dn{width:44px;height:44px;font-size:1.4rem;margin:0}}
+@media (prefers-reduced-motion:no-preference){
+  .blooms use{transform-box:fill-box;transform-origin:center;animation:open .9s cubic-bezier(.2,.8,.3,1.2) both}
+  .blooms use:nth-of-type(2){animation-delay:.08s}.blooms use:nth-of-type(3){animation-delay:.16s}.blooms use:nth-of-type(4){animation-delay:.24s}
+  .blooms use:nth-of-type(5){animation-delay:.32s}.blooms use:nth-of-type(6){animation-delay:.4s}.blooms use:nth-of-type(7){animation-delay:.48s}.blooms use:nth-of-type(8){animation-delay:.56s}
+}
+@keyframes open{from{opacity:0;scale:.2}}
 </style>
 </head>
 <body>
+<div class="hero">
+<svg class="blooms" viewBox="0 0 420 260" aria-hidden="true" focusable="false"><defs><symbol id="blossom" overflow="visible"><g class="bl"><g fill="var(--pink)"><ellipse cx="0" cy="-17" rx="11" ry="16"/><ellipse cx="0" cy="-17" rx="11" ry="16" transform="rotate(72)"/><ellipse cx="0" cy="-17" rx="11" ry="16" transform="rotate(144)"/><ellipse cx="0" cy="-17" rx="11" ry="16" transform="rotate(216)"/><ellipse cx="0" cy="-17" rx="11" ry="16" transform="rotate(288)"/></g><circle r="7" fill="var(--gold)"/></g></symbol></defs><path d="M60 250 C140 200 190 170 250 120 S360 40 430 20" stroke="rgba(255,255,255,.22)" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M250 120 C270 150 300 165 340 170" stroke="rgba(255,255,255,.22)" stroke-width="4" fill="none" stroke-linecap="round"/><use href="#blossom" transform="translate(250 112) rotate(10) scale(1.5)" opacity="1"/><use href="#blossom" transform="translate(330 60) rotate(-20) scale(1.15)" opacity="1"/><use href="#blossom" transform="translate(395 28) rotate(30) scale(1.6)" opacity="1"/><use href="#blossom" transform="translate(345 172) rotate(40) scale(1.0)" opacity="0.95"/><use href="#blossom" transform="translate(175 175) rotate(-10) scale(0.85)" opacity="0.9"/><use href="#blossom" transform="translate(110 222) rotate(25) scale(0.65)" opacity="0.85"/><use href="#blossom" transform="translate(300 115) rotate(0) scale(0.5)" opacity="0.8"/><use href="#blossom" transform="translate(400 130) rotate(15) scale(0.75)" opacity="0.9"/></svg>
 <div class="wrap">
   <header class="top">
     <div class="brand">
@@ -168,6 +216,7 @@ dialog.panel::backdrop{background:rgba(10,20,14,.55)}
       <button type="button" class="btn ghost" id="open-inbox" hidden>Mi bandeja <span class="badge" id="inbox-badge" hidden></span></button>
     </div>
   </header>
+</div>
 </div>
 
 <div class="filters">
@@ -212,7 +261,7 @@ dialog.panel::backdrop{background:rgba(10,20,14,.55)}
     <p>Agenda SCZ reúne información publicada por medios, boleterías, instituciones culturales y la Alcaldía. Los datos marcados como “por confirmar” no estaban publicados en la fuente: revise el enlace antes de salir.</p>
     <p>No todos los eventos tienen venta de entradas en línea. Cuando existe, verá el botón <b>Comprar entradas</b> o <b>Entradas por WhatsApp</b>. Si no, <b>Más información</b> lleva a la fuente (noticia, página del organizador) y las entradas suelen venderse en el lugar.</p>
     <p>Fuentes de esta edición: El Deber, La Razón, Unitel, Red Uno, Asuntos Centrales, Gourmet Magazine Bolivia, Sonilum, Urubó Biergarten, Vamos Eventos, Secretaría Municipal de Cultura y Turismo, Fexpocruz, Bolivamos, Ticketeg, Multipago, Ventik, Eventbrite, Songkick, Shazam y Bolivia.com Cine.</p>
-    <p>Versión de prueba. La agenda se actualiza todas las noches a las 23:00.</p>
+    <p>Versión de prueba. La agenda se actualiza todas las noches a las 22:00.</p>
   </div>
 </footer>
 
@@ -406,7 +455,7 @@ dialog.panel::backdrop{background:rgba(10,20,14,.55)}
     var chips='<button type="button" class="chip" data-cat="all" aria-pressed="'+(state.cat==="all")+'">Todo <span class="n">'+base.length+'</span></button>';
     CATS.forEach(function(cdef){
       var k=base.filter(function(e){return e.cats.indexOf(cdef[0])>=0;}).length;
-      chips+='<button type="button" class="chip" data-cat="'+cdef[0]+'" aria-pressed="'+(state.cat===cdef[0])+'"><i class="dot" style="background:var(--c-'+cdef[0]+')"></i>'+cdef[1]+' <span class="n">'+k+'</span></button>';
+      chips+='<button type="button" class="chip" style="--cc:var(--c-'+cdef[0]+')" data-cat="'+cdef[0]+'" aria-pressed="'+(state.cat===cdef[0])+'"><i class="dot" style="background:var(--c-'+cdef[0]+')"></i>'+cdef[1]+' <span class="n">'+k+'</span></button>';
     });
     document.getElementById("chips").innerHTML=chips;
     try{localStorage.setItem("agenda-scz-filtros",JSON.stringify({cat:state.cat}));}catch(err){}
