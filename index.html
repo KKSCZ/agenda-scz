@@ -93,6 +93,10 @@ article.ev{background:var(--surface);border:1px solid var(--line);border-left:5p
 .foot{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin-top:12px;font-size:.88rem}
 .foot a.go{font-weight:700;text-decoration:none;border:1px solid var(--accent);border-radius:8px;padding:5px 10px}
 .foot a.go:hover{background:var(--accent);color:var(--accent-ink)}
+.foot a.go.buy{background:var(--accent);color:var(--accent-ink)}
+.foot a.go.wa{background:#1f8f4e;border-color:#1f8f4e;color:#fff}
+.foot a.go.wa:hover{background:#176e3c;border-color:#176e3c}
+.foot .nobuy{color:var(--muted);font-style:italic}
 .foot .src{color:var(--muted)}
 .flagc{background:var(--warn-soft);color:var(--warn);border-radius:6px;padding:2px 8px;font-weight:600}
 .empty{padding:40px 0;text-align:center;color:var(--muted)}
@@ -206,6 +210,7 @@ dialog.panel::backdrop{background:rgba(10,20,14,.55)}
 <footer>
   <div class="wrap">
     <p>Agenda SCZ reúne información publicada por medios, boleterías, instituciones culturales y la Alcaldía. Los datos marcados como “por confirmar” no estaban publicados en la fuente: revise el enlace antes de salir.</p>
+    <p>No todos los eventos tienen venta de entradas en línea. Cuando existe, verá el botón <b>Comprar entradas</b> o <b>Entradas por WhatsApp</b>. Si no, <b>Más información</b> lleva a la fuente (noticia, página del organizador) y las entradas suelen venderse en el lugar.</p>
     <p>Fuentes de esta edición: El Deber, La Razón, Unitel, Red Uno, Asuntos Centrales, Gourmet Magazine Bolivia, Sonilum, Urubó Biergarten, Vamos Eventos, Secretaría Municipal de Cultura y Turismo, Fexpocruz, Bolivamos, Ticketeg, Multipago, Ventik, Eventbrite, Songkick, Shazam y Bolivia.com Cine.</p>
     <p>Versión de prueba. La agenda se actualiza todas las noches a las 23:00.</p>
   </div>
@@ -284,6 +289,11 @@ dialog.panel::backdrop{background:rgba(10,20,14,.55)}
   function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
   function norm(s){return String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");}
   function safeUrl(u){return /^https?:\/\//i.test(u||"")?u:"";}
+  // Sites where the link itself sells tickets.
+  var TICKET_SITES=/(^|\.)(ticketeg\.com|todotix\.com|superticket\.com\.bo|superticket\.bo|multipago\.com|clicket\.bo|ventik\.com\.bo|ventik\.com|passline\.com|eventbrite\.com|tickets\.showdemier\.com|grupoartistico\.tecnocloud\.com|tuentrada\.com\.bo)$/i;
+  function isTicketUrl(u){ try{ return TICKET_SITES.test(new URL(u).hostname); }catch(x){ return false; } }
+  function waLink(num,title){ var d=String(num||"").replace(/\D/g,""); if(d.length<8) return ""; if(d.length===8) d="591"+d;
+    return "https://wa.me/"+d+"?text="+encodeURIComponent("Hola, quisiera información sobre entradas para "+title+" (lo vi en Agenda SCZ)."); }
 
   var events = (DATA.events||[]).map(function(e){
     var s=dayNum(e.start), en=e.end?dayNum(e.end):s;
@@ -316,6 +326,18 @@ dialog.panel::backdrop{background:rgba(10,20,14,.55)}
   }
   function inRange(e,r){return e.e>=r[0] && e.s<=r[1];}
 
+  function buyBtns(e,url){
+    var h="", buy=safeUrl(e.buy), wa=waLink(e.wa,e.title), sold=false;
+    if(buy){ h+='<a class="go buy" href="'+esc(buy)+'" target="_blank" rel="noopener">Comprar entradas</a>'; sold=true; }
+    if(wa){ h+='<a class="go wa" href="'+esc(wa)+'" target="_blank" rel="noopener">Entradas por WhatsApp</a>'; sold=true; }
+    if(url){
+      if(!sold && isTicketUrl(url)){ h+='<a class="go buy" href="'+esc(url)+'" target="_blank" rel="noopener">Comprar entradas</a>'; sold=true; }
+      else if(url!==buy){ h+='<a class="go" href="'+esc(url)+'" target="_blank" rel="noopener">Más información</a>'; }
+    }
+    if(e.tickets) h+='<span class="nobuy">Entradas: '+esc(e.tickets)+'</span>';
+    else if(!sold && !e.free) h+='<span class="nobuy">Sin venta en línea publicada</span>';
+    return h;
+  }
   function card(e,whenText){
     var first=(e.cats||[])[0];
     var cats=(e.cats||[]).map(function(c){return '<span><i class="dot" style="background:var(--c-'+c+')"></i>'+esc(CAT[c]||c)+'</span>';}).join("");
@@ -334,7 +356,7 @@ dialog.panel::backdrop{background:rgba(10,20,14,.55)}
       +'<div><dt>Costo</dt>'+cost+'</div>'
       +'</dl>'
       +'<div class="foot">'
-      +(url?'<a class="go" href="'+esc(url)+'" target="_blank" rel="noopener">Ver más y entradas</a>':'')
+      +buyBtns(e,url)
       +(e.confirm?'<span class="flagc">Faltan datos por confirmar</span>':'')
       +(e.src?'<span class="src">Fuente: '+esc(e.src)+'</span>':'')
       +'</div></article>';
