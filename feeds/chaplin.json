@@ -1,0 +1,61 @@
+{
+ "result": true,
+ "data": [
+  {
+   "0": "1103",
+   "id": "1103",
+   "1": "CHAPLINAZO: Viernes 27/11, 05/11/26 00:00",
+   "evento": "CHAPLINAZO: Viernes 27/11, 05/11/26 00:00",
+   "2": "documentos_erp/mod_esp/eventos/web/Sistema 002.png",
+   "path_imagen": "documentos_erp/mod_esp/eventos/web/Sistema 002.png",
+   "3": "Viernes 27/11",
+   "nombre": "Viernes 27/11",
+   "4": "2026-11-05 00:00:00",
+   "fecha": "2026-11-05 00:00:00",
+   "5": "27/11/26 21:00",
+   "fechaEvento": "27/11/26 21:00"
+  },
+  {
+   "0": "1104",
+   "id": "1104",
+   "1": "CHAPLINAZO: S\u00e1bado 28/11, 05/11/26 00:00",
+   "evento": "CHAPLINAZO: S\u00e1bado 28/11, 05/11/26 00:00",
+   "2": "documentos_erp/mod_esp/eventos/web/Sistema 002.png",
+   "path_imagen": "documentos_erp/mod_esp/eventos/web/Sistema 002.png",
+   "3": "S\u00e1bado 28/11",
+   "nombre": "S\u00e1bado 28/11",
+   "4": "2026-11-05 00:00:00",
+   "fecha": "2026-11-05 00:00:00",
+   "5": "28/11/26 21:00",
+   "fechaEvento": "28/11/26 21:00"
+  },
+  {
+   "0": "1106",
+   "id": "1106",
+   "1": "Pobres Ricos: Martes 01/12, 17/11/26 00:00",
+   "evento": "Pobres Ricos: Martes 01/12, 17/11/26 00:00",
+   "2": "documentos_erp/mod_esp/eventos/web/Sistema Pobres ricos OK.png",
+   "path_imagen": "documentos_erp/mod_esp/eventos/web/Sistema Pobres ricos OK.png",
+   "3": "Martes 01/12",
+   "nombre": "Martes 01/12",
+   "4": "2026-11-17 00:00:00",
+   "fecha": "2026-11-17 00:00:00",
+   "5": "01/12/26 21:00",
+   "fechaEvento": "01/12/26 21:00"
+  },
+  {
+   "0": "1107",
+   "id": "1107",
+   "1": "Pobres Ricos: Martes 08/12, 17/11/26 00:00",
+   "evento": "Pobres Ricos: Martes 08/12, 17/11/26 00:00",
+   "2": "documentos_erp/mod_esp/eventos/web/Sistema Pobres ricos OK.png",
+   "path_imagen": "documentos_erp/mod_esp/eventos/web/Sistema Pobres ricos OK.png",
+   "3": "Martes 08/12",
+   "nombre": "Martes 08/12",
+   "4": "2026-11-17 00:00:00",
+   "fecha": "2026-11-17 00:00:00",
+   "5": "08/12/26 21:00",
+   "fechaEvento": "08/12/26 21:00"
+  }
+ ]
+}
