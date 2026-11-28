@@ -1,0 +1,212 @@
+[
+ {
+  "url": "https://go.botmaker.com/rest/webchat/sg0/hirest?useorigin=true",
+  "body": {
+   "tx": "Y1ZX2CRN",
+   "suggestionsDataUrl": "https://storage.googleapis.com/m-infra.appspot.com/public/rule-suggestions/multipago/20261126-multipago-1P2SR.json",
+   "initialMessages": [
+    {
+     "CREATION_TIME": "2026-11-28T03:18:59.191Z",
+     "INTENT_ID": "FIRST_MESSAGE",
+     "literals": [
+      "Hola ${firstName}, Cómo puedo ayudarte?"
+     ],
+     "FILES_URLS": [],
+     "_id_": "ESOUDBD6M704PI9BSD5C",
+     "FROM": "me",
+     "ITEMS": [],
+     "type": "text",
+     "MESSAGE": "Hola , Cómo puedo ayudarte?",
+     "BOT_ID": "50H8FVXNTIVXECVHQH8X",
+     "VIDEOS_URLS": [],
+     "group": "firstSession",
+     "BUSINESS_ID": "multipago",
+     "REACTIONS": [],
+     "FROM_NAME": "Bot",
+     "OPTIONS": [],
+     "AUDIOS_URLS": [],
+     "itemId": "B0PTVRQDROEIFR",
+     "REPRESENTATION_ID": "BotSays.multipago:50H8FVXNTIVXECVHQH8X:FIRST_MESSAGE",
+     "RENDERING_INFO": {
+      "explain": {
+       "response": {
+        "name": "Mensaje inicial",
+        "id": "multipago:50H8FVXNTIVXECVHQH8X:FIRST_MESSAGE",
+        "type": "FIRST_MESSAGE",
+        "items": []
+       }
+      }
+     },
+     "IMAGES_URLS": []
+    },
+    {
+     "CREATION_TIME": "2026-11-28T03:18:59.192Z",
+     "INTENT_ID": "FIRST_MESSAGE",
+     "literals": [
+      "Selecciona una opción:"
+     ],
+     "FILES_URLS": [],
+     "_id_": "1A3HI1ROPPWQIPYAG3KD",
+     "FROM": "me",
+     "ITEMS": [],
+     "type": "buttons",
+     "MESSAGE": "Selecciona una opción:",
+     "INDEX": 1,
+     "VIDEOS_URLS": [],
+     "BUSINESS_ID": "multipago",
+     "REACTIONS": [],
+     "FROM_NAME": "Bot",
+     "OPTIONS": [
+      {
+       "itemType": "postback",
+       "disable": false,
+       "_id_": "{\"intent\":\"RuleBuilder:multipago-KH7wzp2s6aw4w0p@b.m-1679065250817\",\"button\":\"Eventos disponibles\",\"entities\":\"{}\"}",
+       "id": "AAJV07QW0W9RI9",
+       "value": "Eventos disponibles"
+      },
+      {
+       "itemType": "postback",
+       "disable": false,
+       "_id_": "{\"intent\":\"RuleBuilder:multipago-GNccJzng49hcvu9@b.m-1679065250817\",\"button\":\"Consultas\",\"entities\":\"{}\"}",
+       "id": "LJIW7E4XE0WRQ8",
+       "value": "Consultas"
+      },
+      {
+       "itemType": "postback",
+       "disable": false,
+       "_id_": "{\"intent\":\"RuleBuilder:multipago-X0nCG5yhysxb9n3@b.m-1679065250817\",\"button\":\"Reclamos\",\"entities\":\"{}\"}",
+       "id": "F9GY1BEYY57CGN",
+       "value": "Reclamos"
+      }
+     ],
+     "AUDIOS_URLS": [],
+     "itemId": "K7MVGERB0CM5J6",
+     "REPRESENTATION_ID": "BotSays.multipago:50H8FVXNTIVXECVHQH8X:FIRST_MESSAGE",
+     "RENDERING_INFO": {
+      "explain": {
+       "response": {
+        "name": "Menú Ticketeg",
+        "id": "multipago:50H8FVXNTIVXECVHQH8X:FIRST_MESSAGE",
+        "type": "TEXT_MESSAGE_TEXTUAL",
+        "items": []
+       }
+      }
+     },
+     "HAS_QUICK_REPLIES": true,
+     "name": "Menú Ticketeg",
+     "IMAGES_URLS": []
+    }
+   ],
+   "type": "SERVER_INITIAL_DATA",
+   "hamburger": [],
+   "addOperatorNamePrefixToResponses": false,
+   "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ3ZWJJZCI6IkNYU1RYUkYzRzIiLCJidXNpbmVzc0lkIjoibXVsdGlwYWdvIiwiY3VzdG9tZXJJZCI6IkJPNzlYUEVaRFZVVVBWQzgxRkFPIiwiZXhwIjoxODAzNjExOTM5fQ.cKK4jNAKyobbIhTH68IQo2hm0A2NcVMPfMw4aWqC4ug",
+   "sg": "wspg0",
+   "webchatInsideMobileApp": false,
+   "messages": [
+    {
+     "CREATION_TIME": "2026-11-28T03:18:59.191Z",
+     "INTENT_ID": "FIRST_MESSAGE",
+     "literals": [
+      "Hola ${firstName}, Cómo puedo ayudarte?"
+     ],
+     "FILES_URLS": [],
+     "_id_": "ESOUDBD6M704PI9BSD5C",
+     "FROM": "me",
+     "ITEMS": [],
+     "type": "text",
+     "MESSAGE": "Hola , Cómo puedo ayudarte?",
+     "BOT_ID": "50H8FVXNTIVXECVHQH8X",
+     "VIDEOS_URLS": [],
+     "group": "firstSession",
+     "BUSINESS_ID": "multipago",
+     "REACTIONS": [],
+     "FROM_NAME": "Bot",
+     "OPTIONS": [],
+     "AUDIOS_URLS": [],
+     "itemId": "B0PTVRQDROEIFR",
+     "REPRESENTATION_ID": "BotSays.multipago:50H8FVXNTIVXECVHQH8X:FIRST_MESSAGE",
+     "RENDERING_INFO": {
+      "explain": {
+       "response": {
+        "name": "Mensaje inicial",
+        "id": "multipago:50H8FVXNTIVXECVHQH8X:FIRST_MESSAGE",
+        "type": "FIRST_MESSAGE",
+        "items": []
+       }
+      }
+     },
+     "IMAGES_URLS": []
+    },
+    {
+     "CREATION_TIME": "2026-11-28T03:18:59.192Z",
+     "INTENT_ID": "FIRST_MESSAGE",
+     "literals": [
+      "Selecciona una opción:"
+     ],
+     "FILES_URLS": [],
+     "_id_": "1A3HI1ROPPWQIPYAG3KD",
+     "FROM": "me",
+     "ITEMS": [],
+     "type": "buttons",
+     "MESSAGE": "Selecciona una opción:",
+     "INDEX": 1,
+     "VIDEOS_URLS": [],
+     "BUSINESS_ID": "multipago",
+     "REACTIONS": [],
+     "FROM_NAME": "Bot",
+     "OPTIONS": [
+      {
+       "itemType": "postback",
+       "disable": false,
+       "_id_": "{\"intent\":\"RuleBuilder:multipago-KH7wzp2s6aw4w0p@b.m-1679065250817\",\"button\":\"Eventos disponibles\",\"entities\":\"{}\"}",
+       "id": "AAJV07QW0W9RI9",
+       "value": "Eventos disponibles"
+      },
+      {
+       "itemType": "postback",
+       "disable": false,
+       "_id_": "{\"intent\":\"RuleBuilder:multipago-GNccJzng49hcvu9@b.m-1679065250817\",\"button\":\"Consultas\",\"entities\":\"{}\"}",
+       "id": "LJIW7E4XE0WRQ8",
+       "value": "Consultas"
+      },
+      {
+       "itemType": "postback",
+       "disable": false,
+       "_id_": "{\"intent\":\"RuleBuilder:multipago-X0nCG5yhysxb9n3@b.m-1679065250817\",\"button\":\"Reclamos\",\"entities\":\"{}\"}",
+       "id": "F9GY1BEYY57CGN",
+       "value": "Reclamos"
+      }
+     ],
+     "AUDIOS_URLS": [],
+     "itemId": "K7MVGERB0CM5J6",
+     "REPRESENTATION_ID": "BotSays.multipago:50H8FVXNTIVXECVHQH8X:FIRST_MESSAGE",
+     "RENDERING_INFO": {
+      "explain": {
+       "response": {
+        "name": "Menú Ticketeg",
+        "id": "multipago:50H8FVXNTIVXECVHQH8X:FIRST_MESSAGE",
+        "type": "TEXT_MESSAGE_TEXTUAL",
+        "items": []
+       }
+      }
+     },
+     "HAS_QUICK_REPLIES": true,
+     "name": "Menú Ticketeg",
+     "IMAGES_URLS": []
+    }
+   ],
+   "serverTime": "2026-11-28T03:18:59.195Z",
+   "lang": "es",
+   "customer": {
+    "BUSINESS_ID": "multipago",
+    "LAST_SESSION_CREATION_TIME": "2026-11-28T03:18:59.168Z",
+    "PLATFORM_CONTACT_ID": "CXSTXRF3G2-7090221EOZ4E35HP4ZDSZWU3G85",
+    "_id_": "BO79XPEZDVUUPVC81FAO",
+    "CHAT_PLATFORM_ID": "webchat",
+    "lastClearChatTime": 0
+   },
+   "connectws": false
+  }
+ }
+]
