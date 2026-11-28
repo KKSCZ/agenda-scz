@@ -3,7 +3,7 @@ y guarda el texto visible, los enlaces y las respuestas JSON que la página pidi
 - Ticketeg siempre (su portada lista los eventos en venta).
 - Además, reintenta con navegador las páginas de fetch_pages.py que fallaron (las que figuran en feeds/.failed).
 Uso: python3 fetch_rendered.py   (escribe feeds/*.txt / feeds/*.json y deja en feeds/.failed solo lo que sigue fallando)"""
-import json, os, sys
+import json, os, sys, urllib.parse
 
 RENDER = {
     "ticketeg": "https://ticketeg.com/#/",
@@ -42,7 +42,10 @@ with sync_playwright() as p:
         captured = []
         def on_response(r):
             try:
-                if "json" in (r.headers.get("content-type") or "") and len(captured) < 40:
+                site = ".".join(urllib.parse.urlparse(url).hostname.split(".")[-2:])
+                host = urllib.parse.urlparse(r.url).hostname or ""
+                # solo respuestas del propio sitio (no chats ni estadísticas de terceros)
+                if host.endswith(site) and "json" in (r.headers.get("content-type") or "") and len(captured) < 40:
                     body = r.text()
                     if 20 < len(body) < 2_000_000:
                         captured.append({"url": r.url, "body": json.loads(body)})
@@ -50,7 +53,9 @@ with sync_playwright() as p:
                 pass
         page.on("response", on_response)
         try:
-            page.goto(url, wait_until="networkidle", timeout=60000)
+            page.goto(url, wait_until="load", timeout=45000)
+            try: page.wait_for_load_state("networkidle", timeout=15000)
+            except Exception: pass
             page.wait_for_timeout(4000)
             for _ in range(6):  # bajar por la página para que carguen las listas largas
                 page.mouse.wheel(0, 2500); page.wait_for_timeout(800)
