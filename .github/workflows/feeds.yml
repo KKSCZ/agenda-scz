@@ -1,6 +1,7 @@
 # Descarga cada noche las carteleras en línea de Show de Mier y Chaplin Show,
-# los estrenos de cine de Bolivia.com y las publicaciones recientes de Gourmet Magazine Bolivia,
-# y las guarda en feeds/, para que la actualización nocturna de Agenda SCZ (22:00)
+# los estrenos de cine de Bolivia.com, las publicaciones recientes de Gourmet Magazine Bolivia,
+# la sección de cultura de El Deber, las listas de Bolivamos, las salas Sonilum (Vamos Eventos)
+# y la portada de Ticketeg (abierta con navegador), y las guarda en feeds/, para que la actualización nocturna de Agenda SCZ (22:00)
 # las lea desde aquí sin tener que entrar a esos sitios.
 name: Carteleras
 
@@ -19,9 +20,15 @@ concurrency:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+
+      - name: Instalar navegador (para páginas con JavaScript)
+        continue-on-error: true
+        run: |
+          pip install --quiet playwright
+          python3 -m playwright install --with-deps chromium
 
       - name: Descargar carteleras
         run: |
@@ -42,6 +49,7 @@ jobs:
           fetch showdemier "https://tickets.showdemier.com/api/ventaonline/eventos"
           fetch chaplin "https://grupoartistico.tecnocloud.com/erp/mod_espectaculo/modelos/apichaplin.php?accion=eventosAbiertosOnline&del_dia=si"
           python3 .github/scripts/fetch_pages.py || true
+          python3 .github/scripts/fetch_rendered.py || true
           failed="$failed $(cat feeds/.failed 2>/dev/null)"; rm -f feeds/.failed
           failed="$(echo $failed)"
           python3 - "$failed" <<'PY'
@@ -50,7 +58,9 @@ jobs:
           path = "feeds/status.json"
           st = json.load(open(path)) if os.path.exists(path) else {}
           now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-4))).isoformat(timespec="minutes")
-          for n in ("showdemier", "chaplin", "cine-estrenos", "cine-cartelera", "gourmet"):
+          for n in ("showdemier", "chaplin", "cine-estrenos", "cine-cartelera", "gourmet",
+                    "eldeber-cultura", "bolivamos-nuevos", "bolivamos-finde", "bolivamos-musica", "bolivamos-cultura",
+                    "sonilum-plaza", "sonilum-arena", "ticketeg"):
               e = st.get(n, {})
               e["last_try"] = now
               e["ok"] = n not in failed
@@ -59,7 +69,9 @@ jobs:
               st[n] = e
           json.dump(st, open(path, "w"), indent=1, ensure_ascii=False)
           PY
-          echo "FAILED=$failed" >> "$GITHUB_ENV"
+          # Solo las carteleras de teatro y cine marcan el trabajo como fallido; las demás fuentes dejan un aviso.
+          core=""; for n in $failed; do case "$n" in showdemier|chaplin|cine-estrenos|cine-cartelera|gourmet) core="$core $n";; *) echo "::warning::$n: no se pudo descargar; se conserva la copia anterior";; esac; done
+          echo "FAILED=$(echo $core)" >> "$GITHUB_ENV"
 
       - name: Guardar en el repositorio
         run: |
