@@ -1,7 +1,8 @@
-# Descarga cada noche las carteleras en línea de Show de Mier y Chaplin Show
+# Descarga cada noche las carteleras en línea de Show de Mier y Chaplin Show,
+# los estrenos de cine de Bolivia.com y las publicaciones recientes de Gourmet Magazine Bolivia,
 # y las guarda en feeds/, para que la actualización nocturna de Agenda SCZ (22:00)
 # las lea desde aquí sin tener que entrar a esos sitios.
-name: Carteleras de teatros
+name: Carteleras
 
 on:
   schedule:
@@ -40,13 +41,16 @@ jobs:
           }
           fetch showdemier "https://tickets.showdemier.com/api/ventaonline/eventos"
           fetch chaplin "https://grupoartistico.tecnocloud.com/erp/mod_espectaculo/modelos/apichaplin.php?accion=eventosAbiertosOnline&del_dia=si"
+          python3 .github/scripts/fetch_pages.py || true
+          failed="$failed $(cat feeds/.failed 2>/dev/null)"; rm -f feeds/.failed
+          failed="$(echo $failed)"
           python3 - "$failed" <<'PY'
           import json, sys, datetime, os
           failed = sys.argv[1].split()
           path = "feeds/status.json"
           st = json.load(open(path)) if os.path.exists(path) else {}
           now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-4))).isoformat(timespec="minutes")
-          for n in ("showdemier", "chaplin"):
+          for n in ("showdemier", "chaplin", "cine-estrenos", "cine-cartelera", "gourmet"):
               e = st.get(n, {})
               e["last_try"] = now
               e["ok"] = n not in failed
