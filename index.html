@@ -198,6 +198,15 @@ footer b{color:#fff}
   .blooms use:nth-of-type(5){animation-delay:.32s}.blooms use:nth-of-type(6){animation-delay:.4s}.blooms use:nth-of-type(7){animation-delay:.48s}.blooms use:nth-of-type(8){animation-delay:.56s}
 }
 @keyframes open{from{opacity:0;scale:.2}}
+
+/* ---- Firma KK ---- */
+.sig{display:flex;align-items:center;gap:12px;margin:18px 0 0;padding-top:16px;border-top:1px solid rgba(255,255,255,.14)}
+.sig svg{width:46px;height:46px;flex:0 0 auto;transition:transform .6s cubic-bezier(.2,.8,.3,1.2)}
+.sig:hover svg{transform:rotate(72deg)}
+.sig .who{display:flex;flex-direction:column;line-height:1.2}
+.sig .who span{font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+.sig .who b{font-family:var(--display);font-weight:800;font-size:1.05rem;color:#fff;letter-spacing:-.01em}
+@media (prefers-reduced-motion:reduce){.sig svg{transition:none}.sig:hover svg{transform:none}}
 </style>
 </head>
 <body>
@@ -262,6 +271,10 @@ footer b{color:#fff}
     <p>No todos los eventos tienen venta de entradas en línea. Cuando existe, verá el botón <b>Comprar entradas</b> o <b>Entradas por WhatsApp</b>. Si no, <b>Más información</b> lleva a la fuente (noticia, página del organizador) y las entradas suelen venderse en el lugar.</p>
     <p>Fuentes de esta edición: El Deber, La Razón, Unitel, Red Uno, Asuntos Centrales, Gourmet Magazine Bolivia, Sonilum, Urubó Biergarten, Vamos Eventos, Secretaría Municipal de Cultura y Turismo, Fexpocruz, Bolivamos, Ticketeg, Multipago, Ventik, Eventbrite, Songkick, Shazam y Bolivia.com Cine.</p>
     <p>Versión de prueba. La agenda se actualiza todas las noches a las 22:00.</p>
+    <p class="sig" title="Agenda SCZ, una idea de KK">
+      <svg viewBox="-34 -34 68 68" aria-hidden="true" focusable="false"><g fill="var(--pink)"><ellipse cx="0" cy="-17" rx="11" ry="16"/><ellipse cx="0" cy="-17" rx="11" ry="16" transform="rotate(72)"/><ellipse cx="0" cy="-17" rx="11" ry="16" transform="rotate(144)"/><ellipse cx="0" cy="-17" rx="11" ry="16" transform="rotate(216)"/><ellipse cx="0" cy="-17" rx="11" ry="16" transform="rotate(288)"/></g><circle r="13" fill="var(--gold)"/><text y="4.6" text-anchor="middle" font-family="Bricolage Grotesque, Figtree, sans-serif" font-weight="800" font-size="13" letter-spacing="-.5" fill="#00532c">KK</text></svg>
+      <span class="who"><span>Una agenda curada por</span><b>KK · hecha en Santa Cruz</b></span>
+    </p>
   </div>
 </footer>
 
