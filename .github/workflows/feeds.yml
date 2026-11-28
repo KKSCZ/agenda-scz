@@ -1,0 +1,77 @@
+# Descarga cada noche las carteleras en línea de Show de Mier y Chaplin Show
+# y las guarda en feeds/, para que la actualización nocturna de Agenda SCZ (22:00)
+# las lea desde aquí sin tener que entrar a esos sitios.
+name: Carteleras de teatros
+
+on:
+  schedule:
+    - cron: "47 0 * * *"   # 20:47 hora de Bolivia (00:47 UTC)
+  workflow_dispatch: {}     # permite correrlo a mano desde la pestaña Actions
+
+permissions:
+  contents: write
+
+concurrency:
+  group: feeds
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Descargar carteleras
+        run: |
+          mkdir -p feeds
+          UA="Mozilla/5.0 (compatible; AgendaSCZ/1.0; +https://kkscz.github.io/agenda-scz/)"
+          failed=""
+          fetch () {
+            name="$1"; url="$2"
+            if curl -fsSL --retry 3 --retry-delay 10 -m 60 -A "$UA" -H "Accept: application/json" "$url" -o "/tmp/$name.json" \
+               && python3 -c "import json,sys; json.load(open(sys.argv[1]))" "/tmp/$name.json"; then
+              python3 -m json.tool --indent 1 "/tmp/$name.json" > "feeds/$name.json"
+              echo "$name: OK ($(wc -c < feeds/$name.json) bytes)"
+            else
+              echo "::warning::$name: no se pudo descargar o no es JSON; se conserva la copia anterior"
+              failed="$failed $name"
+            fi
+          }
+          fetch showdemier "https://tickets.showdemier.com/api/ventaonline/eventos"
+          fetch chaplin "https://grupoartistico.tecnocloud.com/erp/mod_espectaculo/modelos/apichaplin.php?accion=eventosAbiertosOnline&del_dia=si"
+          python3 - "$failed" <<'PY'
+          import json, sys, datetime, os
+          failed = sys.argv[1].split()
+          path = "feeds/status.json"
+          st = json.load(open(path)) if os.path.exists(path) else {}
+          now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=-4))).isoformat(timespec="minutes")
+          for n in ("showdemier", "chaplin"):
+              e = st.get(n, {})
+              e["last_try"] = now
+              e["ok"] = n not in failed
+              if n not in failed:
+                  e["last_ok"] = now
+              st[n] = e
+          json.dump(st, open(path, "w"), indent=1, ensure_ascii=False)
+          PY
+          echo "FAILED=$failed" >> "$GITHUB_ENV"
+
+      - name: Guardar en el repositorio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add feeds
+          if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
+          git commit -m "Carteleras de teatros $(TZ=America/La_Paz date +%Y-%m-%d)"
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            sleep 5
+          done
+          exit 1
+
+      - name: Avisar si algo falló
+        if: env.FAILED != ''
+        run: |
+          echo "::error::No se pudo descargar:$FAILED"
+          exit 1
